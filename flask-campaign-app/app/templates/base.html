@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Flask Campaign App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+</head>
+<body>
+    <header>
+        <h1>Sistema de Campanhas Publicitarias</h1>
+        <nav>
+            <ul>
+                <li>
+                    <a href="{{ url_for('main.gallery') }}">
+                        <button class="animated-button">
+                            <span>Galeria</span>
+                            <span></span>
+                        </button>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('main.campaign_config') }}">
+                        <button class="animated-button">
+                            <span>Configurar</span>
+                            <span></span>
+                        </button>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('main.saved_campaigns') }}">
+                        <button class="animated-button">
+                            <span>Campanhas Salvas</span>
+                            <span></span>
+                        </button>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('main.cad_maquina') }}">
+                        <button class="animated-button">
+                            <span>CadMáquina</span>
+                            <span></span>
+                        </button>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <main style="width: 100%; max-width: none; margin: 0; padding: 0;">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>

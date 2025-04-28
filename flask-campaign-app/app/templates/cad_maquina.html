@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Máquina</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    {% include 'base.html' %}
+    <div class="container">
+        <h1 class="color3">Cadastro de Máquina</h1>
+        <form id="machineForm" method="POST" action="{{ url_for('main.cad_maquina') }}">
+            <input 
+                type="text" 
+                placeholder="ID da Máquina (IP)" 
+                name="machine_id" 
+                class="input" 
+                required 
+                pattern="^((25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$" 
+                title="Digite um endereço IP válido (ex: 192.168.0.101)">
+            <button type="submit">Cadastrar Máquina</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria de Mídia</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    {% include 'base.html' %}
+    <div class="container">
+        <div class="gallery">
+            <h1>Galeria de Mídia</h1>
+            <!-- Conteúdo da galeria -->
+        </div>
+        <form action="{{ url_for('main.gallery') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="media_files">Selecione até 5 arquivos de mídia (imagens ou vídeos):</label>
+                <input type="file" id="media_files" name="media_files" multiple accept="image/*,video/*">
+                <p style="font-size: 12px; color: gray;">Você pode selecionar até 5 arquivos por vez.</p>
+            </div>
+            <button type="submit">Fazer Upload</button>
+        </form>
+        <h2>Arquivos de Mídia</h2>
+        <div class="media-gallery">
+            {% if media_files %}
+                {% for file in media_files %}
+                    <div class="media-item">
+                        {% if file.endswith('.mp4') %}
+                            <video controls>
+                                <source src="{{ url_for('static', filename='uploads/' + file) }}" type="video/mp4">
+                                Seu navegador não suporta vídeos.
+                            </video>
+                        {% else %}
+                            <img src="{{ url_for('static', filename='uploads/' + file) }}" alt="{{ file }}">
+                        {% endif %}
+                        <p title="{{ file }}">{{ file }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Nenhum arquivo de mídia encontrado.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
