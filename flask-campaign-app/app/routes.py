@@ -302,7 +302,7 @@ def save_association():
         return {"success": False, "message": "Nome da campanha é obrigatório."}, 400
 
     # Carregar associações existentes
-    associations_file = get_associations_file()
+    associations_file = os.path.join(current_app.root_path, 'data', 'associations.json')
     if os.path.exists(associations_file):
         with open(associations_file, 'r') as file:
             associations = json.load(file)
@@ -514,3 +514,34 @@ def get_updated():
 
     # Caso o arquivo não exista, retornar "updated" como 0
     return jsonify({"updated": 0}), 200
+
+@main.route('/static/data/machines.json', methods=['GET'])
+def get_machines():
+    machines_file = os.path.join(current_app.root_path, 'data', 'machines.json')
+    if os.path.exists(machines_file):
+        with open(machines_file, 'r') as file:
+            machines = json.load(file)
+        return jsonify(machines)
+    else:
+        return jsonify({"error": "Arquivo machines.json não encontrado."}), 404
+    
+    
+@main.route('/static/data/associations.json', methods=['GET'])
+def get_associations():
+    associations_file = os.path.join(current_app.root_path, 'data', 'associations.json')
+    if os.path.exists(associations_file):
+        with open(associations_file, 'r') as file:
+            associations = json.load(file)
+        return jsonify(associations)
+    else:
+        return jsonify({"error": "Arquivo associations.json não encontrado."}), 404
+    
+@main.route('/static/data/campaigns.json', methods=['GET'])
+def get_campaigns_data():
+    campaigns_file = os.path.join(current_app.root_path, 'data', 'campaigns.json')
+    if os.path.exists(campaigns_file):
+        with open(campaigns_file, 'r') as file:
+            campaigns = json.load(file)
+        return jsonify(campaigns)
+    else:
+        return jsonify({"error": "Arquivo campaigns.json não encontrado."}), 404

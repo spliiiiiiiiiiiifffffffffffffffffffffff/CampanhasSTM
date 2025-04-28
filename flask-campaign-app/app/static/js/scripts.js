@@ -198,3 +198,249 @@ if (closePreviewButton) {
         return campaignDiv;
     }
 });
+// Função para abrir o modal de adicionar máquinas
+function openAddMachinesModal(campaignName) {
+    const addMachinesModal = document.getElementById('addMachinesModal');
+    const machinesList = document.getElementById('machinesList');
+
+    if (!addMachinesModal || !machinesList) {
+        console.error('Modal ou lista de máquinas não encontrado.');
+        return;
+    }
+
+    // Limpa a lista de máquinas
+    machinesList.innerHTML = '';
+
+    // Carregar os IPs de machines.json
+    fetch('/static/data/machines.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro ao carregar máquinas: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(machines => {
+            // Carregar associações de associations.json
+            return fetch('/static/data/associations.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Erro ao carregar associações: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(associations => {
+                    // Processar máquinas e associações
+                    machines.forEach(machine => {
+                        const isAssociated = associations.find(
+                            assoc => assoc.machine_ip === machine
+                        );
+
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.name = 'machine';
+                        checkbox.value = machine;
+                        checkbox.id = `machine-${machine}`;
+                        checkbox.checked = !!isAssociated; // Marcar como selecionado se estiver associado a qualquer campanha
+                        checkbox.disabled = false; // Permitir que o IP seja selecionado/desmarcado
+
+                        const label = document.createElement('label');
+                        label.htmlFor = `machine-${machine}`;
+                        label.textContent = machine;
+
+                        const listItem = document.createElement('div');
+                        listItem.appendChild(checkbox);
+                        listItem.appendChild(label);
+
+                        machinesList.appendChild(listItem);
+                    });
+                });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar máquinas ou associações:', error);
+        });
+
+    // Exibe o modal
+    addMachinesModal.style.display = 'block';
+
+    // Salvar a campanha associada no modal
+    addMachinesModal.dataset.campaignName = campaignName;
+}
+
+// Função para fechar o modal de adicionar máquinas
+function closeAddMachinesModal() {
+    const addMachinesModal = document.getElementById('addMachinesModal');
+    if (addMachinesModal) {
+        addMachinesModal.style.display = 'none';
+    }
+}
+
+// Função para salvar as associações
+function saveAssociations() {
+    const addMachinesModal = document.getElementById('addMachinesModal');
+    const machinesList = document.getElementById('machinesList');
+    const campaignName = addMachinesModal.dataset.campaignName;
+
+    if (!campaignName) {
+        console.error('Nome da campanha não encontrado no modal.');
+        return;
+    }
+
+    // Obter os IPs selecionados
+    const selectedMachines = Array.from(machinesList.querySelectorAll('input[name="machine"]:checked'))
+        .map(checkbox => checkbox.value);
+
+    if (selectedMachines.length === 0) {
+        alert('Selecione pelo menos um IP.');
+        return;
+    }
+
+    // Enviar as associações para o servidor
+    fetch('/save_association', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            campaign_name: campaignName,
+            machines: selectedMachines,
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                closeAddMachinesModal();
+            } else {
+                alert('Erro ao salvar associações: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao salvar associações:', error);
+        });
+}
+
+// Função para abrir o modal de edição de campanha
+function openEditModal(campaignName) {
+    const editModal = document.getElementById('editModal');
+    const editCampaignTitle = document.getElementById('editCampaignTitle');
+    const editCampaignContent = document.getElementById('editCampaignContent');
+
+    if (!editModal || !editCampaignTitle || !editCampaignContent) {
+        console.error('Modal de edição ou elementos relacionados não encontrados.');
+        return;
+    }
+
+    // Define o título do modal
+    editCampaignTitle.textContent = `Editar Campanha: ${campaignName}`;
+
+    // Limpa o conteúdo anterior do modal
+    editCampaignContent.innerHTML = '';
+
+    // Carregar campanhas e exibir os anúncios da campanha selecionada
+    fetch('/static/data/campaigns.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro ao carregar campanhas: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(campaigns => {
+            // Carregar mídias disponíveis na galeria
+            return fetch('/gallery')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Erro ao carregar mídias: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(mediaFiles => {
+                    // Encontrar a campanha selecionada
+                    const campaign = campaigns.find(camp => camp.name === campaignName);
+
+                    if (!campaign) {
+                        console.error(`Campanha "${campaignName}" não encontrada.`);
+                        return;
+                    }
+
+                    // Exibir os anúncios da campanha
+                    campaign.ads.forEach((ad, index) => {
+                        const adDiv = document.createElement('div');
+                        adDiv.className = 'ad-edit';
+                        adDiv.innerHTML = `
+                            <h4>Anúncio ${index + 1}</h4>
+                            <div class="media-list">
+                                ${ad.media
+                                    .map(
+                                        (media, mediaIndex) => `
+                                        <div>
+                                            <label for="media-${index}-${mediaIndex}">Mídia ${mediaIndex + 1}:</label>
+                                            <select id="media-${index}-${mediaIndex}" name="media">
+                                                ${mediaFiles
+                                                    .map(
+                                                        file => `
+                                                        <option value="${file}" ${
+                                                            file === media ? 'selected' : ''
+                                                        }>${file}</option>
+                                                    `
+                                                    )
+                                                    .join('')}
+                                            </select>
+                                        </div>
+                                    `
+                                    )
+                                    .join('')}
+                            </div>
+                        `;
+                        editCampaignContent.appendChild(adDiv);
+                    });
+
+                    // Adicionar botão para salvar alterações
+                    const saveButton = document.createElement('button');
+                    saveButton.textContent = 'Salvar Alterações';
+                    saveButton.className = 'save-btn';
+                    saveButton.addEventListener('click', () => saveCampaignEdits(campaignName));
+                    editCampaignContent.appendChild(saveButton);
+                });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar campanhas ou mídias:', error);
+        });
+
+    // Exibe o modal
+    editModal.style.display = 'block';
+}
+
+// Função para salvar as edições da campanha
+function saveCampaignEdits(campaignName) {
+    const editCampaignContent = document.getElementById('editCampaignContent');
+    const ads = Array.from(editCampaignContent.querySelectorAll('.ad-edit')).map(adDiv => {
+        const media = Array.from(adDiv.querySelectorAll('select[name="media"]')).map(
+            dropdown => dropdown.value
+        );
+        return { media };
+    });
+
+    // Enviar as alterações para o servidor
+    fetch('/save_campaign', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: campaignName,
+            ads,
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                closeEditModal();
+            } else {
+                alert('Erro ao salvar alterações.');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao salvar alterações:', error);
+        });
+}
