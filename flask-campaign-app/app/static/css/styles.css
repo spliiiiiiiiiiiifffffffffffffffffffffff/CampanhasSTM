@@ -883,3 +883,76 @@ button[type="submit"] {
 .layout-btn:hover {
     background-color: #45a049; /* Cor ao passar o mouse */
 }
+
+/* Estilo para o popup */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+}
+
+.popup button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.popup button:hover {
+    background-color: #45a049;
+}
+/* Estilos específicos para anúncios no modal de edição de campanhas */
+.edit-campaign-ads .ad {
+    height: 200px; /* Define uma altura fixa para os anúncios */
+    background: #000000; /* Fundo do anúncio */
+    padding: 15px; /* Espaçamento interno */
+    border-radius: 5px; /* Bordas arredondadas */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Adiciona uma sombra leve */
+    box-sizing: border-box; /* Inclui padding e borda no cálculo da largura */
+    margin-bottom: 15px; /* Espaçamento inferior entre os anúncios */
+}
+
+.edit-campaign-ads .ad h3 {
+    margin-bottom: 10px; /* Espaçamento inferior do título */
+    color: #ffffff; /* Cor do título */
+}
+
+.edit-campaign-ads .ad select {
+    margin-right: 10px; /* Espaçamento lateral entre os dropdowns */
+    margin-bottom: 10px; /* Espaçamento inferior entre os dropdowns */
+    width: 30%; /* Ajusta a largura dos dropdowns */
+}
+#machinesList {
+    max-height: 200px; /* Altura máxima do contêiner */
+    overflow-y: auto; /* Adiciona rolagem vertical */
+    border: 1px solid #ccc; /* Adiciona uma borda para destacar o contêiner */
+    padding: 10px; /* Adiciona espaçamento interno */
+    background-color: #000000; /* Fundo claro para contraste */
+    border-radius: 5px; /* Bordas arredondadas */
+}
+footer {
+    background-color: #373A66;
+    height: 300px; /* Ajuste a altura conforme necessário */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    position: relative; /* Garante que o footer esteja dentro do fluxo da página */
+    width: 100%; /* Garante que ocupe toda a largura */
+}
+html, body {
+    height: auto; /* Permite que o conteúdo cresça */
+    margin: 0;
+    padding: 0;
+}

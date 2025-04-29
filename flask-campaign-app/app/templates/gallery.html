@@ -13,7 +13,7 @@
             <h1>Galeria de Mídia</h1>
             <!-- Conteúdo da galeria -->
         </div>
-        <form action="{{ url_for('main.gallery') }}" method="POST" enctype="multipart/form-data">
+        <form id="uploadForm" action="{{ url_for('gallery.gallery') }}" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="media_files">Selecione até 5 arquivos de mídia (imagens ou vídeos):</label>
                 <input type="file" id="media_files" name="media_files" multiple accept="image/*,video/*">
@@ -42,5 +42,33 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- Popup -->
+    <div id="popup" class="popup" style="display: none;">
+        <span id="popupMessage"></span>
+        <button onclick="closePopup()">Fechar</button>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const mediaFilesInput = document.getElementById('media_files');
+        const popup = document.getElementById('popup');
+        const popupMessage = document.getElementById('popupMessage');
+
+        uploadForm.addEventListener('submit', function (event) {
+            if (!mediaFilesInput.files.length) {
+                event.preventDefault(); // Impede o envio do formulário
+                popupMessage.textContent = 'Nenhuma mídia foi selecionada.';
+                popup.style.display = 'block'; // Exibe o popup
+            }
+        });
+
+        function closePopup() {
+            popup.style.display = 'none'; // Fecha o popup
+        }
+    </script>
 </body>
+<footer style="background-color: #373A66; height: 500px; display: flex; justify-content: center; align-items: center; color: white;">
+    <p>BY ©STM.CO</p>
+</footer>
 </html>

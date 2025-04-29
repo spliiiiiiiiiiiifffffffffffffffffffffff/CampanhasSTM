@@ -10,7 +10,7 @@
     {% include 'base.html' %}
     <div class="container">
         <h1 class="color3">Cadastro de Máquina</h1>
-        <form id="machineForm" method="POST" action="{{ url_for('main.cad_maquina') }}">
+        <form id="machineForm">
             <input 
                 type="text" 
                 placeholder="ID da Máquina (IP)" 
@@ -22,5 +22,46 @@
             <button type="submit">Cadastrar Máquina</button>
         </form>
     </div>
+
+    <!-- Popup -->
+    <div id="popup" class="popup" style="display: none;">
+        <span id="popupMessage"></span>
+        <button onclick="closePopup()">Fechar</button>
+    </div>
+
+    <script>
+        const form = document.getElementById('machineForm');
+        const popup = document.getElementById('popup');
+        const popupMessage = document.getElementById('popupMessage');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Impede o envio padrão do formulário
+
+            const machineIp = form.machine_id.value;
+
+            fetch('/associations/save_machine', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ machine_ip: machineIp }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    popupMessage.textContent = data.message;
+                    popup.style.display = 'block'; // Exibe o popup
+                    if (response.ok) {
+                        form.reset(); // Limpa o formulário se o IP foi salvo com sucesso
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao salvar o IP:', error);
+                });
+        });
+
+        function closePopup() {
+            popup.style.display = 'none'; // Fecha o popup
+        }
+    </script>
 </body>
 </html>

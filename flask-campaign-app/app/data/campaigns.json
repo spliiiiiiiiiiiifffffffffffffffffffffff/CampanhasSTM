@@ -4,16 +4,16 @@
         "ads": [
             {
                 "media": [
-                    "drawio.PNG",
                     "Logo_STM_sem_fundo.png",
-                    "drawio.PNG"
+                    "bebe1.gif",
+                    "bebe1.gif"
                 ]
             },
             {
                 "media": [
                     "Logo_Solution_slogan_sem_fundo.png",
-                    "drawio.PNG",
-                    "FaZe_Brian_-_Family_Guy_Trickshot_Thankyou_PewDiePie.mp4"
+                    "FaZe_Brian_-_Family_Guy_Trickshot_Thankyou_PewDiePie.mp4",
+                    "bebe1.gif"
                 ]
             },
             {
@@ -26,8 +26,8 @@
             {
                 "media": [
                     "video1.mp4",
-                    "drawio.PNG",
-                    "video1.mp4"
+                    "bebe1.gif",
+                    "bebe1.gif"
                 ]
             }
         ]
@@ -37,7 +37,7 @@
         "ads": [
             {
                 "media": [
-                    "drawio.PNG",
+                    "Logo_STM_sem_fundo.png",
                     "Logo_Solution_slogan_sem_fundo.png",
                     "Logo_STM_sem_fundo.png"
                 ]
@@ -66,6 +66,18 @@
                     "paiacada.jpg",
                     "paiacada.jpg",
                     "paiacada.jpg"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "sahur tuntun",
+        "ads": [
+            {
+                "media": [
+                    "bebe1.gif",
+                    "Logo_STM_sem_fundo.png",
+                    "bebe1.gif"
                 ]
             }
         ]
