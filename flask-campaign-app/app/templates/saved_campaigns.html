@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campanhas Salvas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="/static/css/styles-extension.css">
     <script>
         const machines = {{ machines | tojson }};
     </script>
-    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/campaigns.js') }}" type="module" defer></script>
+    <script src="{{ url_for('static', filename='js/ads.js') }}" type="module" defer></script>
+    <script src="{{ url_for('static', filename='js/modals.js') }}" type="module" defer></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" type="module"></script>
 </head>
 <body>
     {% include 'base.html' %}
@@ -37,7 +41,7 @@
                             <button class="add-machines-btn" onclick="openAddMachinesModal('{{ campaign.name }}')">
                                 Adicionar a "{{ campaign.name }}"
                             </button>
-                            <button class="edit-campaign-btn" onclick="openEditModal('{{ campaign.name }}')">
+                            <button class="edit-campaign-btn" onclick="openEditMediaModal('{{ campaign.name }}')">
                                 Editar Campanha
                             </button>
                         </div>
@@ -57,8 +61,7 @@
                 <div id="editCampaignContent">
                     <!-- O conteúdo da campanha será carregado dinamicamente -->
                 </div>
-                <button type="button" id="addAdButton" class="add-ad-btn">Adicionar Anúncio</button>
-                <button type="submit" class="save-btn">Salvar Alterações</button>
+                <button type="button" class="save-btn" onclick="saveCampaignChanges()">Salvar Alterações</button>
             </form>
         </div>
     </div>
@@ -67,14 +70,116 @@
         <span class="close" onclick="closeAddMachinesModal()">&times;</span>
         <h2>Adicionar Máquinas à Campanha</h2>
         <form id="addMachinesForm" onsubmit="event.preventDefault(); saveAssociations();">
-            <p>Selecione até 5 máquinas para associar:</p>
+            <p>Selecione os IPs para associar à campanha:</p>
             <div id="machinesList">
-                <!-- As máquinas serão preenchidas dinamicamente pelo JavaScript -->
+                <!-- Os checkboxes serão preenchidos dinamicamente pelo JavaScript -->
             </div>
             <button type="submit">Salvar Associações</button>
         </form>
     </div>
 </div>
+
+<script>
+    let currentCampaignName = '';
+
+    function openAddMachinesModal(campaignName) {
+        currentCampaignName = campaignName;
+
+        // Limpar a lista de máquinas
+        const machinesList = document.getElementById('machinesList');
+        machinesList.innerHTML = '';
+
+        // Obter os dados de máquinas e associações
+        fetch('/associations/get_machines')
+            .then(response => response.json())
+            .then(machines => {
+                fetch('/associations/get_associations')
+                    .then(response => response.json())
+                    .then(associations => {
+                        machines.forEach(machine => {
+                            // Verificar se o IP está associado a qualquer campanha
+                            const isAssociated = associations.some(
+                                assoc => assoc.machine_ip === machine
+                            );
+
+                            // Verificar se o IP está associado à campanha atual
+                            const isCurrentCampaign = associations.some(
+                                assoc => assoc.machine_ip === machine && assoc.campaign_name === campaignName
+                            );
+
+                            // Criar o checkbox
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.value = machine;
+                            checkbox.name = 'machine_ips';
+                            checkbox.checked = isCurrentCampaign; // Marcar como selecionado apenas se estiver associado à campanha atual
+                            checkbox.disabled = isAssociated && !isCurrentCampaign; // Desabilitar se estiver associado a outra campanha
+
+                            // Adicionar evento para remover associação ao desmarcar
+                            checkbox.addEventListener('change', function () {
+                                if (!checkbox.checked) {
+                                    removeAssociation(machine, campaignName);
+                                }
+                            });
+
+                            // Criar o label
+                            const label = document.createElement('label');
+                            label.textContent = machine;
+                            label.style.marginLeft = '10px';
+
+                            // Adicionar o checkbox e o label à lista
+                            const div = document.createElement('div');
+                            div.appendChild(checkbox);
+                            div.appendChild(label);
+                            machinesList.appendChild(div);
+                        });
+
+                        // Exibir o modal
+                        const modal = document.getElementById('addMachinesModal');
+                        modal.style.display = 'block';
+                    });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar máquinas ou associações:', error);
+            });
+    }
+
+    function saveAssociations() {
+        const selectedIps = Array.from(
+            document.querySelectorAll('#machinesList input[type="checkbox"]:checked')
+        ).map(checkbox => checkbox.value);
+
+        const unselectedIps = Array.from(
+            document.querySelectorAll('#machinesList input[type="checkbox"]:not(:checked)')
+        ).map(checkbox => checkbox.value);
+
+        fetch('/associations/save_association', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                campaign_name: currentCampaignName,
+                machine_ips: selectedIps, // Enviar os IPs selecionados
+                unselected_ips: unselectedIps, // Enviar os IPs desmarcados
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                closeAddMachinesModal();
+                location.reload(); // Recarregar a página para atualizar os dados
+            })
+            .catch(error => {
+                console.error('Erro ao salvar associações:', error);
+            });
+    }
+
+    function closeAddMachinesModal() {
+        const modal = document.getElementById('addMachinesModal');
+        modal.style.display = 'none';
+    }
+</script>
     <!-- Modal de Preview -->
 <div id="previewContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center;">
     <div style="background: white; padding: 20px; border-radius: 10px; max-width: 80%; max-height: 80%; overflow: auto;">
@@ -85,31 +190,142 @@
         <button id="closePreview" style="margin-top: 20px; padding: 10px 20px; background-color: #3d405b; color: white; border: none; border-radius: 5px; cursor: pointer;">Fechar</button>
     </div>
 </div>
-    <script>
-        function removeCampaign(campaignName) {
-            if (confirm(`Tem certeza de que deseja remover a campanha "${campaignName}"?`)) {
-                fetch(`/delete_campaign`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name: campaignName }),
-                })
+   
+<div id="editMediaModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditMediaModal()">&times;</span>
+        <h2>Editar Anúncios da Campanha</h2>
+        <form id="editMediaForm" onsubmit="event.preventDefault(); saveMediaChanges();">
+            <p>Edite os anúncios associados à campanha:</p>
+            <div id="adContainer" class="edit-campaign-ads">
+                <!-- Os anúncios serão preenchidos dinamicamente pelo JavaScript -->
+            </div>
+            <button type="button" id="addAdButton">Adicionar Anúncio</button>
+            <button type="submit">Salvar Alterações</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let currentEditCampaignName = '';
+
+    function openEditMediaModal(campaignName) {
+        currentEditCampaignName = campaignName;
+
+        // Limpar o container de anúncios
+        const adContainer = document.getElementById('adContainer');
+        adContainer.innerHTML = '';
+
+        // Obter as campanhas e os anúncios associados à campanha selecionada
+        fetch('/campaigns/list_campaigns')
+            .then(response => response.json())
+            .then(campaigns => {
+                const campaign = campaigns.find(c => c.name === campaignName);
+                const ads = campaign ? campaign.ads : [];
+
+                // Criar os anúncios existentes
+                ads.forEach((ad, index) => {
+                    const adDiv = createAdDiv(ad.media, index);
+                    adContainer.appendChild(adDiv);
+                });
+
+                // Adicionar funcionalidade ao botão "Adicionar Anúncio"
+                const addAdButton = document.getElementById('addAdButton');
+                addAdButton.onclick = () => {
+                    const newAdDiv = createAdDiv([], adContainer.children.length);
+                    adContainer.appendChild(newAdDiv);
+                };
+
+                // Exibir o modal
+                const modal = document.getElementById('editMediaModal');
+                modal.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Erro ao carregar campanhas:', error);
+            });
+    }
+
+    function createAdDiv(media, adIndex) {
+        const adDiv = document.createElement('div');
+        adDiv.className = 'ad';
+        adDiv.style.marginBottom = '15px'; // Reduz o espaço entre os anúncios
+
+        // Adicionar título do anúncio
+        const adTitle = document.createElement('h3');
+        adTitle.textContent = `Anúncio ${adIndex + 1}`;
+        adTitle.style.marginBottom = '10px';
+        adDiv.appendChild(adTitle);
+
+        // Criar 3 dropdowns para as mídias
+        for (let i = 0; i < 3; i++) {
+            const dropdown = document.createElement('select');
+            dropdown.name = 'media_files';
+            dropdown.style.marginRight = '10px'; // Reduz o espaço lateral entre os dropdowns
+
+            // Adicionar opção "Nenhuma"
+            const noneOption = document.createElement('option');
+            noneOption.value = '';
+            noneOption.textContent = 'Nenhuma';
+            dropdown.appendChild(noneOption);
+
+            // Adicionar todas as mídias disponíveis
+            fetch('/gallery/gallery') // Obter mídias da pasta uploads
                 .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        document.querySelector(`[data-campaign-name="${campaignName}"]`).remove();
-                    } else {
-                        alert(data.message);
+                .then(allMedia => {
+                    allMedia.forEach(mediaFile => {
+                        const option = document.createElement('option');
+                        option.value = mediaFile;
+                        option.textContent = mediaFile;
+                        dropdown.appendChild(option);
+                    });
+
+                    // Selecionar a mídia associada, se existir
+                    if (media[i]) {
+                        dropdown.value = media[i];
                     }
                 })
                 .catch(error => {
-                    console.error('Erro ao remover campanha:', error);
+                    console.error('Erro ao carregar mídias:', error);
                 });
-            }
+
+            adDiv.appendChild(dropdown);
         }
-    </script>
+
+        return adDiv;
+    }
+
+    function closeEditMediaModal() {
+        const modal = document.getElementById('editMediaModal');
+        modal.style.display = 'none';
+    }
+
+    function saveMediaChanges() {
+        const ads = Array.from(document.querySelectorAll('#adContainer .ad')).map(adDiv => {
+            const media = Array.from(adDiv.querySelectorAll('select')).map(select => select.value);
+            return { media: media.filter(m => m !== '') }; // Filtrar mídias vazias
+        });
+
+        fetch(`/campaigns/edit_campaign/${currentEditCampaignName}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: currentEditCampaignName,
+                ads: ads
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                closeEditMediaModal();
+                location.reload(); // Recarregar a página para atualizar os dados
+            })
+            .catch(error => {
+                console.error('Erro ao salvar alterações de anúncios:', error);
+            });
+    }
+</script>
 </body>
 </html>
 

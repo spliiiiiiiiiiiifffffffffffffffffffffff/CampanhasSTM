@@ -1,0 +1,62 @@
+/* Estilo do botão de menu hambúrguer */
+.hamburger-icon {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ffffff;
+    display: block !important; /* Força a exibição do botão */
+}
+
+/* Estilo do menu suspenso para dispositivos móveis */
+.mobile-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background-color: #1e1e1e;
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    width: 200px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    z-index: 9999; /* Garante que o menu fique sempre à frente */
+}
+
+.mobile-menu li {
+    border-bottom: 1px solid #333;
+}
+
+.mobile-menu li:last-child {
+    border-bottom: none;
+}
+
+.mobile-menu a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+    transition: background-color 0.3s ease;
+}
+
+.mobile-menu a:hover {
+    background-color: #333;
+}
+
+/* Esconde o menu por padrão */
+.hidden {
+    display: none;
+}
+
+/* Exibe o botão de menu hambúrguer em telas pequenas */
+@media (max-width: 768px) {
+    .hamburger-icon {
+        display: block;
+    }
+
+    .desktop-menu {
+        display: none; /* Esconde o menu padrão em telas pequenas */
+    }
+}

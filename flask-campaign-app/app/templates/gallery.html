@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galeria de Mídia</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="/static/css/styles-extension.css">
 </head>
 <body>
     {% include 'base.html' %}
@@ -13,7 +14,7 @@
             <h1>Galeria de Mídia</h1>
             <!-- Conteúdo da galeria -->
         </div>
-        <form action="{{ url_for('main.gallery') }}" method="POST" enctype="multipart/form-data">
+        <form id="uploadForm" action="{{ url_for('gallery.gallery') }}" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="media_files">Selecione até 5 arquivos de mídia (imagens ou vídeos):</label>
                 <input type="file" id="media_files" name="media_files" multiple accept="image/*,video/*">
@@ -42,5 +43,30 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- Popup -->
+    <div id="popup" class="popup" style="display: none;">
+        <span id="popupMessage"></span>
+        <button onclick="closePopup()">Fechar</button>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const mediaFilesInput = document.getElementById('media_files');
+        const popup = document.getElementById('popup');
+        const popupMessage = document.getElementById('popupMessage');
+
+        uploadForm.addEventListener('submit', function (event) {
+            if (!mediaFilesInput.files.length) {
+                event.preventDefault(); // Impede o envio do formulário
+                popupMessage.textContent = 'Nenhuma mídia foi selecionada.';
+                popup.style.display = 'block'; // Exibe o popup
+            }
+        });
+
+        function closePopup() {
+            popup.style.display = 'none'; // Fecha o popup
+        }
+    </script>
 </body>
 </html>
