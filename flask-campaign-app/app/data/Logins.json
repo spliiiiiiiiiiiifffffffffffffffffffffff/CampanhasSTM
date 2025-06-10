@@ -1,0 +1,12 @@
+[
+    {
+        "username": "admin",
+        "password": "adminpassword",
+        "tipo": 1
+    },
+    {
+        "username": "client",
+        "password": "clientpassword",
+        "tipo": 0
+    }
+]

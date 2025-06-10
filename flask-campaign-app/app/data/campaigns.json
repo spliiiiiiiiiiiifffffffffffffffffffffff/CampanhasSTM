@@ -1,83 +1,96 @@
-[
-    {
-        "name": "tralalero tralala",
-        "ads": [
-            {
-                "media": [
-                    "Logo_STM_sem_fundo.png"
-                ]
-            },
-            {
-                "media": [
-                    "Logo_Solution_slogan_sem_fundo.png",
-                    "FaZe_Brian_-_Family_Guy_Trickshot_Thankyou_PewDiePie.mp4",
-                    "bebe1.gif"
-                ]
-            },
-            {
-                "media": [
-                    "FaZe_Brian_-_Family_Guy_Trickshot_Thankyou_PewDiePie.mp4",
-                    "Logo_Solution_slogan_sem_fundo.png",
-                    "FaZe_Brian_-_Family_Guy_Trickshot_Thankyou_PewDiePie.mp4"
-                ]
-            },
-            {
-                "media": [
-                    "video1.mp4",
-                    "video1.mp4",
-                    "bebe1.gif"
-                ]
-            }
-        ]
-    },
-    {
-        "name": "tungtungtungtgunsahur",
-        "ads": [
-            {
-                "media": [
-                    "FaZe_Brian_-_Family_Guy_Trickshot_Thankyou_PewDiePie.mp4",
-                    "Logo_Solution_slogan_sem_fundo.png",
-                    "Logo_STM_sem_fundo.png"
-                ]
-            },
-            {
-                "media": [
-                    "skeleton3.gif",
-                    "propaganda.png",
-                    "bebe1.gif"
-                ]
-            }
-        ]
-    },
-    {
-        "name": "brrr patap\u00edm",
-        "ads": [
-            {
-                "media": [
-                    "drawio.PNG",
-                    "video1.mp4",
-                    "paiacada.jpg"
-                ]
-            },
-            {
-                "media": [
-                    "paiacada.jpg",
-                    "paiacada.jpg",
-                    "paiacada.jpg"
-                ]
-            }
-        ]
-    },
-    {
-        "name": "sahur tuntun",
-        "ads": [
-            {
-                "media": [
-                    "bebe1.gif",
-                    "FaZe_Brian_-_Family_Guy_Trickshot_Thankyou_PewDiePie.mp4",
-                    "bebe1.gif"
-                ]
-            }
-        ]
+{
+    "campaigns": [
+        {
+            "name": "tralalero tralala",
+            "mode": "self",
+            "ads": [
+                {
+                    "media": [
+                        "paiacada.jpg",
+                        "propaganda.png",
+                        "ascii-text-art (3).png"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "tungtungtungtgunsahur",
+            "mode": "self",
+            "ads": [
+                {
+                    "media": [
+                        "FaZe_Brian_-_Family_Guy_Trickshot_Thankyou_PewDiePie.mp4",
+                        "Logo_Solution_slogan_sem_fundo.png",
+                        "Logo_STM_sem_fundo.png"
+                    ]
+                },
+                {
+                    "media": [
+                        "skeleton3.gif",
+                        "propaganda.png",
+                        "bebe1.gif"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "brrr patapÃ­",
+            "mode": "self",
+            "ads": [
+                {
+                    "media": [
+                        "propaganda.png",
+                        "propaganda.png",
+                        "propaganda.png"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "sahur tuntun",
+            "mode": "self",
+            "ads": [
+                {
+                    "media": [
+                        "bebe1.gif",
+                        "FaZe_Brian_-_Family_Guy_Trickshot_Thankyou_PewDiePie.mp4",
+                        "bebe1.gif"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "MULTITECK",
+            "mode": "self",
+            "ads": [
+                {
+                    "media": [
+                        "propaganda.png",
+                        "bebe1.gif",
+                        "paiacada.jpg"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "vvcnbvcn",
+            "mode": "inibicao",
+            "ads": [
+                {
+                    "media": [
+                        "carimbo1.png"
+                    ]
+                }
+            ]
+        }
+    ],
+    "tags": {
+        "bebe1.gif": "bebe dancarino",
+        "video1.mp4": "VÃ­deo de ApresentaÃ§Ã£o",
+        "ascii-text-art (4).png": "ajfijai",
+        "ascii-text-art (3).png": "mmgsfds",
+        "skeleton.gif": "isqyeleto",
+        "wojak1.jpg": ":0",
+        "Logo_STM_sem_fundo.png": "STM"
     }
-]
+}

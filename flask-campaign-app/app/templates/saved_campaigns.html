@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campanhas Salvas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles-dark.css') }}">
     <link rel="stylesheet" href="/static/css/styles-extension.css">
     <script>
         const machines = {{ machines | tojson }};
@@ -15,7 +15,9 @@
     <script src="{{ url_for('static', filename='js/main.js') }}" type="module"></script>
 </head>
 <body>
-    {% include 'base.html' %}
+    {% extends 'base.html' %}
+
+    {% block content %}
     <div class="container">
         <h1 class="color3">Campanhas Salvas</h1>
         {% if campaigns %}
@@ -30,7 +32,7 @@
                             <ul style="list-style-type: none; padding: 0;">
                                 {% for assoc in associations %}
                                     {% if assoc.campaign_name == campaign.name %}
-                                        <li style="color: blue; margin-bottom: 5px;">{{ assoc.machine_ip }}</li>
+                                        <li style="color: blue; margin-bottom: 5px;">{{ assoc.machine_name | safe }}</li>
                                     {% endif %}
                                 {% endfor %}
                             </ul>
@@ -39,7 +41,7 @@
                         <!-- Botões para adicionar e editar -->
                         <div class="button-group" style="display: flex; gap: 10px; margin-top: 10px;">
                             <button class="add-machines-btn" onclick="openAddMachinesModal('{{ campaign.name }}')">
-                                Adicionar a "{{ campaign.name }}"
+                                Adicionar a <strong>"{{ campaign.name }}"</strong>
                             </button>
                             <button class="edit-campaign-btn" onclick="openEditMediaModal('{{ campaign.name }}')">
                                 Editar Campanha
@@ -65,12 +67,12 @@
             </form>
         </div>
     </div>
-    <div id="addMachinesModal" class="modal" style="display: none;">
+    <div id="addMachinesModal" class="modal add-machines-modal" style="display: none;">
     <div class="modal-content">
         <span class="close" onclick="closeAddMachinesModal()">&times;</span>
-        <h2>Adicionar Máquinas à Campanha</h2>
+        <h2 style="color: #c8fffc">Adicionar Máquinas à Campanha</h2>
         <form id="addMachinesForm" onsubmit="event.preventDefault(); saveAssociations();">
-            <p>Selecione os IPs para associar à campanha:</p>
+            <p><strong>Selecione as maquinas para associar a campanha:</strong></p>
             <div id="machinesList">
                 <!-- Os checkboxes serão preenchidos dinamicamente pelo JavaScript -->
             </div>
@@ -96,35 +98,38 @@
                 fetch('/associations/get_associations')
                     .then(response => response.json())
                     .then(associations => {
-                        machines.forEach(machine => {
+                        Object.entries(machines).forEach(([machineToken, machineData]) => {
+                            const machineIp = machineData.ip;
+                            const machineName = machineData.name;
+
                             // Verificar se o IP está associado a qualquer campanha
                             const isAssociated = associations.some(
-                                assoc => assoc.machine_ip === machine
+                                assoc => assoc.machine_ip === machineIp
                             );
 
                             // Verificar se o IP está associado à campanha atual
                             const isCurrentCampaign = associations.some(
-                                assoc => assoc.machine_ip === machine && assoc.campaign_name === campaignName
+                                assoc => assoc.machine_ip === machineIp && assoc.campaign_name === campaignName
                             );
 
                             // Criar o checkbox
                             const checkbox = document.createElement('input');
                             checkbox.type = 'checkbox';
-                            checkbox.value = machine;
-                            checkbox.name = 'machine_ips';
+                            checkbox.value = machineToken; // Usar o token como valor
+                            checkbox.name = 'machine_tokens';
                             checkbox.checked = isCurrentCampaign; // Marcar como selecionado apenas se estiver associado à campanha atual
                             checkbox.disabled = isAssociated && !isCurrentCampaign; // Desabilitar se estiver associado a outra campanha
 
                             // Adicionar evento para remover associação ao desmarcar
                             checkbox.addEventListener('change', function () {
                                 if (!checkbox.checked) {
-                                    removeAssociation(machine, campaignName);
+                                    removeAssociation(machineToken, campaignName);
                                 }
                             });
 
-                            // Criar o label
+                            // Criar o label com o nome da máquina
                             const label = document.createElement('label');
-                            label.textContent = machine;
+                            label.textContent = machineName || machineIp; // Exibir o nome da máquina ou o IP, se o nome não estiver disponível
                             label.style.marginLeft = '10px';
 
                             // Adicionar o checkbox e o label à lista
@@ -145,11 +150,11 @@
     }
 
     function saveAssociations() {
-        const selectedIps = Array.from(
+        const selectedTokens = Array.from(
             document.querySelectorAll('#machinesList input[type="checkbox"]:checked')
         ).map(checkbox => checkbox.value);
 
-        const unselectedIps = Array.from(
+        const unselectedTokens = Array.from(
             document.querySelectorAll('#machinesList input[type="checkbox"]:not(:checked)')
         ).map(checkbox => checkbox.value);
 
@@ -160,8 +165,8 @@
             },
             body: JSON.stringify({
                 campaign_name: currentCampaignName,
-                machine_ips: selectedIps, // Enviar os IPs selecionados
-                unselected_ips: unselectedIps, // Enviar os IPs desmarcados
+                machine_tokens: selectedTokens, // Enviar os tokens selecionados
+                unselected_tokens: unselectedTokens, // Enviar os tokens desmarcados
             }),
         })
             .then(response => response.json())
@@ -191,14 +196,17 @@
     </div>
 </div>
    
-<div id="editMediaModal" class="modal" style="display: none;">
+<div id="editMediaModal" class="modal edit-campaign-modal" style="display: none;">
     <div class="modal-content">
         <span class="close" onclick="closeEditMediaModal()">&times;</span>
         <h2>Editar Anúncios da Campanha</h2>
         <form id="editMediaForm" onsubmit="event.preventDefault(); saveMediaChanges();">
-            <p>Edite os anúncios associados à campanha:</p>
+            <p style="color: #b2f5ce">Edite os anúncios associados à campanha:</p>
             <div id="adContainer" class="edit-campaign-ads">
                 <!-- Os anúncios serão preenchidos dinamicamente pelo JavaScript -->
+                <select name="adMedia" class="media-dropdown" required>
+                    <option value="">Nenhuma</option>
+                </select>
             </div>
             <button type="button" id="addAdButton">Adicionar Anúncio</button>
             <button type="submit">Salvar Alterações</button>
@@ -219,7 +227,9 @@
         // Obter as campanhas e os anúncios associados à campanha selecionada
         fetch('/campaigns/list_campaigns')
             .then(response => response.json())
-            .then(campaigns => {
+            .then(data => {
+                // Troque campaigns.find por data.campaigns.find
+                const campaigns = Array.isArray(data) ? data : data.campaigns;
                 const campaign = campaigns.find(c => c.name === campaignName);
                 const ads = campaign ? campaign.ads : [];
 
@@ -248,7 +258,8 @@
     function createAdDiv(media, adIndex) {
         const adDiv = document.createElement('div');
         adDiv.className = 'ad';
-        adDiv.style.marginBottom = '15px'; // Reduz o espaço entre os anúncios
+        adDiv.style.position = 'relative';
+        adDiv.style.marginBottom = '15px';
 
         // Adicionar título do anúncio
         const adTitle = document.createElement('h3');
@@ -256,40 +267,60 @@
         adTitle.style.marginBottom = '10px';
         adDiv.appendChild(adTitle);
 
+        // Criar botão "x" para remover o anúncio
+        const removeButton = document.createElement('button');
+        removeButton.className = 'removeAd';
+        removeButton.textContent = 'x';
+        removeButton.style.position = 'absolute';
+        removeButton.style.top = '5px';
+        removeButton.style.right = '5px';
+        removeButton.style.backgroundColor = '#9E1030';
+        removeButton.style.color = 'white';
+        removeButton.style.border = 'none';
+        removeButton.style.borderRadius = '50%';
+        removeButton.style.width = '10px';
+        removeButton.style.height = '10px';
+        removeButton.style.cursor = 'pointer';
+
+        // Adicionar evento de clique para remover o anúncio
+        removeButton.addEventListener('click', function () {
+            adDiv.remove(); // Remove o elemento do DOM
+        });
+
+        adDiv.appendChild(removeButton);
+
         // Criar 3 dropdowns para as mídias
-        for (let i = 0; i < 3; i++) {
-            const dropdown = document.createElement('select');
-            dropdown.name = 'media_files';
-            dropdown.style.marginRight = '10px'; // Reduz o espaço lateral entre os dropdowns
+        fetch(`/campaigns/media_files/${encodeURIComponent(currentEditCampaignName)}`)
+            .then(response => response.json())
+            .then(data => {
+                const mediaFiles = data.media_files;
+                const tags = data.tags || {};
+                for (let i = 0; i < 3; i++) {
+                    const dropdown = document.createElement('select');
+                    dropdown.name = 'media_files';
+                    dropdown.className = 'media-dropdown';
+                    dropdown.style.marginRight = '10px';
 
-            // Adicionar opção "Nenhuma"
-            const noneOption = document.createElement('option');
-            noneOption.value = '';
-            noneOption.textContent = 'Nenhuma';
-            dropdown.appendChild(noneOption);
+                    const noneOption = document.createElement('option');
+                    noneOption.value = '';
+                    noneOption.textContent = 'Nenhuma';
+                    dropdown.appendChild(noneOption);
 
-            // Adicionar todas as mídias disponíveis
-            fetch('/gallery/gallery') // Obter mídias da pasta uploads
-                .then(response => response.json())
-                .then(allMedia => {
-                    allMedia.forEach(mediaFile => {
+                    mediaFiles.forEach(file => {
+                        const displayName = tags[file] ? `tag: ${tags[file]}` : file;
                         const option = document.createElement('option');
-                        option.value = mediaFile;
-                        option.textContent = mediaFile;
+                        option.value = file;
+                        option.textContent = displayName;
+                        // Aqui marcamos como selecionado se for a mídia associada
+                        if (media && media[i] === file) {
+                            option.selected = true;
+                        }
                         dropdown.appendChild(option);
                     });
 
-                    // Selecionar a mídia associada, se existir
-                    if (media[i]) {
-                        dropdown.value = media[i];
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar mídias:', error);
-                });
-
-            adDiv.appendChild(dropdown);
-        }
+                    adDiv.appendChild(dropdown);
+                }
+            });
 
         return adDiv;
     }
@@ -326,6 +357,8 @@
             });
     }
 </script>
+
 </body>
+{% endblock %}
 </html>
 

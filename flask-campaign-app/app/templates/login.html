@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles-dark.css') }}">
     <link rel="stylesheet" href="/static/css/styles-extension.css">
 </head>
 <body>
+    <div id="particles-js" style="position:fixed; width:100vw; height:100vh; z-index:-1; top:0; left:0;"></div>
     <div class="login-container">
-        <h2>Login</h2>
+        <!-- <h2>Login</h2> -->
+        <img src="{{ url_for('static', filename='images/logostmfix.png') }}" alt="Logo STM" class="header-logo" style="display:block; margin: 0 auto 20px auto;">
         <form action="{{ url_for('auth.login') }}" method="POST">
             <div class="inputbox">
                 <input type="text" id="username" name="username" required>
@@ -24,5 +26,11 @@
             <button type="submit">Entrar</button>
         </form>
     </div>
+    <script src="{{ url_for('static', filename='js/particles.min.js') }}"></script>
+    <script>
+    particlesJS.load('particles-js', '/static/particles.json', function() {
+      console.log('particles.js config loaded');
+    });
+    </script>
 </body>
 </html>

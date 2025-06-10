@@ -4,17 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Máquina</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles-dark.css') }}">
     <link rel="stylesheet" href="/static/css/styles-extension.css">
 </head>
 <body>
-    {% include 'base.html' %}
+    {% extends 'base.html' %}
+
+    {% block content %}
+ 
     <div class="container">
         <h1 class="color3">Cadastro de Máquina</h1>
         <form id="machineForm">
+            <!-- Nova caixa de entrada para o nome da máquina -->
             <input 
                 type="text" 
-                placeholder="ID da Máquina (IP)" 
+                placeholder="Nome para máquina" 
+                name="machine_name" 
+                class="input" 
+                required 
+                title="Digite um nome para a máquina (ex: Servidor Principal)">
+            
+            <!-- Caixa de entrada para o IP da máquina -->
+            <input 
+                type="text" 
+                placeholder="IP da máquina" 
                 name="machine_id" 
                 class="input" 
                 required 
@@ -22,6 +35,17 @@
                 title="Digite um endereço IP válido (ex: 192.168.0.101)">
             <button type="submit">Cadastrar Máquina</button>
         </form>
+    </div> <!-- Fim do .container -->
+
+    <div style="background: #8B8B8B; color: #fff; padding: 16px; border-radius: 8px; margin-bottom: 24px; min-height: 250px; max-height: 350px; overflow-y: auto; position: absolute; top: 330px; left: 10px; right: 15px; z-index: 3000;">
+        <h3>Tokens</h3>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            {% for assoc in associations %}
+                <li style="margin-bottom: 8px;">
+                    {{ assoc.campaign_name }} - {{ assoc.machine_token }}
+                </li>
+            {% endfor %}
+        </ul>
     </div>
 
     <!-- Popup -->
@@ -29,6 +53,7 @@
         <span id="popupMessage"></span>
         <button onclick="closePopup()">Fechar</button>
     </div>
+    
 
     <script>
         const form = document.getElementById('machineForm');
@@ -38,25 +63,26 @@
         form.addEventListener('submit', function (event) {
             event.preventDefault(); // Impede o envio padrão do formulário
 
-            const machineIp = form.machine_id.value;
+            const machineName = form.machine_name.value; // Captura o nome da máquina
+            const machineIp = form.machine_id.value; // Captura o IP da máquina
 
             fetch('/associations/save_machine', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ machine_ip: machineIp }),
+                body: JSON.stringify({ machine_name: machineName, machine_ip: machineIp }),
             })
                 .then(response => response.json())
                 .then(data => {
                     popupMessage.textContent = data.message;
                     popup.style.display = 'block'; // Exibe o popup
                     if (response.ok) {
-                        form.reset(); // Limpa o formulário se o IP foi salvo com sucesso
+                        form.reset(); // Limpa o formulário se os dados foram salvos com sucesso
                     }
                 })
                 .catch(error => {
-                    console.error('Erro ao salvar o IP:', error);
+                    console.error('Erro ao salvar a máquina:', error);
                 });
         });
 
@@ -64,5 +90,6 @@
             popup.style.display = 'none'; // Fecha o popup
         }
     </script>
+    {% endblock %}
 </body>
 </html>

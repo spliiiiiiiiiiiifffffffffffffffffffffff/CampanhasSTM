@@ -15,8 +15,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Adicionar funcionalidade ao botão "Adicionar Anúncio"
             campaignDiv.querySelector('.addAd').addEventListener('click', function () {
+                const mode = campaignDiv.querySelector('input[name^="mode-"]:checked');
+                if (!mode) {
+                    alert('Por favor, selecione um modo para a campanha antes de adicionar anúncios.');
+                    return;
+                }
+
                 const adContainer = campaignDiv.querySelector('.adContainer');
-                addAd(adContainer, adTemplate);
+                addAd(adContainer, adTemplate, mode.value);
             });
 
             // Adicionar funcionalidade ao botão "Remover Campanha"
@@ -29,25 +35,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 export function openViewMediaModal(mediaFiles) {
     const modal = document.getElementById('viewMediaModal');
-    const mediaPreviewContainer = document.getElementById('mediaPreviewContainer');
-
-    // Limpar o conteúdo anterior
-    mediaPreviewContainer.innerHTML = '';
-
-    // Adicionar as mídias ao modal
-    mediaFiles.forEach(media => {
-        const mediaElement = document.createElement(media.endsWith('.mp4') ? 'video' : 'img');
-        mediaElement.src = `/static/uploads/${media}`;
-        mediaElement.style.maxWidth = '100%';
-        mediaElement.style.maxHeight = '400px';
-        if (media.endsWith('.mp4')) {
-            mediaElement.controls = true;
-        }
-        mediaPreviewContainer.appendChild(mediaElement);
-    });
-
-    // Exibir o modal
     modal.style.display = 'block';
+
+    // Chamar a lógica de preview com base no modo selecionado
+    handlePreview(mediaFiles);
 }
 
 export function closeViewMediaModal() {
